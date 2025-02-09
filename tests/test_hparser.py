@@ -6,7 +6,7 @@ from src.commandType import CommandType
 
 
 
-@pytest.fixture
+@pytest.fixture #type:ignore
 def test_asm_file(tmp_path: Path) -> Path:
     filepath: Path = tmp_path / "test.asm"
     filepath.write_text(
