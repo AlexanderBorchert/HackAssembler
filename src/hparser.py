@@ -7,26 +7,26 @@ class Parser:
     def __init__(self, file_path: Path):
         self.__file: TextIOWrapper = open(file_path, 'r')
         #the components of the current command where the file cursor is currently
-        self.__command_type: CommandType = None
-        self.__symbol: str = None
-        self.__dest: str = None
-        self.__comp: str = None
-        self.__jump: str = None
+        self.__command_type: CommandType | None = None
+        self.__symbol: str | None = None
+        self.__dest: str | None = None
+        self.__comp: str | None = None
+        self.__jump: str | None = None
         self.advance()
 
-    def get_command_type(self)->CommandType:
+    def get_command_type(self)->CommandType | None:
         return self.__command_type
 
-    def get_symbol(self)-> str:
+    def get_symbol(self)-> str | None:
         return self.__symbol
 
-    def get_dest(self)-> str:
+    def get_dest(self)-> str | None:
         return self.__dest
 
-    def get_comp(self)-> str:
+    def get_comp(self)-> str | None:
         return self.__comp
 
-    def get_jump(self)-> str:
+    def get_jump(self)-> str | None:
         return self.__jump
 
     def has_more_commands(self)-> bool:
