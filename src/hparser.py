@@ -31,11 +31,11 @@ class Parser:
 
     def has_more_commands(self)-> bool:
 
-        current_position = self.__file.tell()
+        # current_position = self.__file.tell()
         next_line = self.__file.readline()
         return bool(next_line)
 
-    def advance(self):
+    def advance(self) -> None:
         current_line: str = self.__file.readline()
         while current_line == "" or current_line.isspace() or current_line.startswith("//"):
             current_line = self.__file.readline()
@@ -56,7 +56,7 @@ class Parser:
                 self.__comp = string_after_equal_sign.split(';')[0]
                 self.__jump = string_after_equal_sign.split(';')[1]
 
-    def __determine_command_type(self, s: str):
+    def __determine_command_type(self, s: str) -> CommandType:
         if s.startswith('@') and s[1:].isdigit():
             return CommandType.A_COMMAND
         elif s.startswith('('):
