@@ -9,14 +9,19 @@
     requires-python = ">=3.9"
     dependencies = [
         "mypy>=1.15.0",
+        "pre-commit>=4.1.0",
         "pytest>=8.3.4",
         "ruff>=0.9.5",
         "setuptools>=75.8.0",
-    ]
+]
 
     [project.optional-dependencies]
     dev = ["mypy", "pytest", "ruff"]
 
     # Customize the `packages` option to ensure `src/hparser` is found
     [tool.setuptools.packages.find]
-    where = ["src"]
+    where = ["src", "tests"]
+
+    [[tool.mypy.overrides]]
+    module = ["pytest.*"]
+    ignore_missing_imports = true
