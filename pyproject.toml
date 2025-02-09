@@ -1,18 +1,22 @@
-[project]
-name = "hackassembler"
-version = "0.1.0"
-description = "Add your description here"
-requires-python = ">=3.9"
-dependencies = [
-    "mypy>=1.15.0",
-    "pytest>=8.3.4",
-    "ruff>=0.9.5",
-    "setuptools>=75.8.0",
-]
+    [build-system]
+    requires = ["setuptools>=75.8.0", "wheel"]
+    build-backend = "setuptools.build_meta"
 
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-python_files = ["test_*.py"]
-addopts = [
-    "--import-mode=importlib",
-]
+    [project]
+    name = "hackassembler"
+    version = "0.1.0"
+    description = "Add your description here"
+    requires-python = ">=3.9"
+    dependencies = [
+        "mypy>=1.15.0",
+        "pytest>=8.3.4",
+        "ruff>=0.9.5",
+        "setuptools>=75.8.0",
+    ]
+
+    [project.optional-dependencies]
+    dev = ["mypy", "pytest", "ruff"]
+
+    # Customize the `packages` option to ensure `src/hparser` is found
+    [tool.setuptools.packages.find]
+    where = ["src"]

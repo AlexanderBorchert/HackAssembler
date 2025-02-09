@@ -22,7 +22,7 @@ wheels = [
 [[package]]
 name = "hackassembler"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "mypy" },
     { name = "pytest" },
@@ -30,11 +30,21 @@ dependencies = [
     { name = "setuptools" },
 ]
 
+[package.optional-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "mypy", specifier = ">=1.15.0" },
+    { name = "mypy", marker = "extra == 'dev'" },
     { name = "pytest", specifier = ">=8.3.4" },
+    { name = "pytest", marker = "extra == 'dev'" },
     { name = "ruff", specifier = ">=0.9.5" },
+    { name = "ruff", marker = "extra == 'dev'" },
     { name = "setuptools", specifier = ">=75.8.0" },
 ]
 
