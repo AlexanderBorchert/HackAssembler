@@ -1,11 +1,12 @@
-from io import TextIOWrapper
 from pathlib import Path
+from typing import TextIO
+
 from src.commandType import CommandType
 
 
 class Parser:
     def __init__(self, file_path: Path):
-        self.__file: TextIOWrapper = open(file_path, "r")
+        self.__file: TextIO = open(file_path, "r")
         # the components of the current command where the file cursor is currently
         self.__command_type: CommandType | None = None
         self.__symbol: str | None = None
@@ -55,7 +56,7 @@ class Parser:
             self.__comp = None
             self.__jump = None
             return
-        self.__command_type = self.__determine_command_type(current_command)
+        self.__command_type = self.__determine_command_type(command=current_command)
         if self.__command_type == CommandType.C_COMMAND:
             self.__symbol = None
             if ";" in current_command and "=" not in current_command:
@@ -77,10 +78,11 @@ class Parser:
             self.__jump = None
             self.__symbol = current_command.replace("@", "")
 
-    def __determine_command_type(self, s: str) -> CommandType:
-        if s.startswith("@") and s[1:].isdigit():
+    @staticmethod
+    def __determine_command_type(command: str) -> CommandType:
+        if command.startswith("@") and command[1:].isdigit():
             return CommandType.A_COMMAND
-        elif s.startswith("("):
+        elif command.startswith("("):
             return CommandType.A_COMMAND
         else:
             return CommandType.C_COMMAND
