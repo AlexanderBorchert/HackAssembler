@@ -2,7 +2,7 @@ import typing
 from pathlib import Path
 
 import pytest
-from src.hparser import Parser
+from src.parser import Parser
 from src.commandType import CommandType
 
 
