@@ -2,8 +2,9 @@ import typing
 from pathlib import Path
 
 import pytest
+
 from src.parser import Parser
-from src.commandType import CommandType
+from src.commands import CommandType, Dest, Comp, Jump
 
 
 @typing.no_type_check
@@ -21,7 +22,7 @@ def test_asm_file(tmp_path: Path) -> Path:
         D=M;JGT
         
         
-        """
+        """  # noqa:W293
     )
     return filepath
 
@@ -36,31 +37,31 @@ def test_parser(test_asm_file: Path) -> None:
     assert parser.get_comp() is None
     assert parser.get_jump() is None
 
-    parser.advance()
+    parser.read_next_command()
     assert parser.has_more_commands()
     assert parser.get_command_type() == CommandType.C_COMMAND
     assert parser.get_symbol() is None
-    assert parser.get_dest() == "M"
-    assert parser.get_comp() == "1"
+    assert parser.get_dest() == Dest.M
+    assert parser.get_comp() == Comp.one
     assert parser.get_jump() is None
 
-    parser.advance()
+    parser.read_next_command()
     assert parser.has_more_commands()
     assert parser.get_command_type() == CommandType.C_COMMAND
     assert parser.get_symbol() is None
     assert parser.get_dest() is None
-    assert parser.get_comp() == "0"
-    assert parser.get_jump() == "JMP"
+    assert parser.get_comp() == Comp.zero
+    assert parser.get_jump() == Jump.JMP
 
-    parser.advance()
+    parser.read_next_command()
     assert not parser.has_more_commands()
     assert parser.get_command_type() == CommandType.C_COMMAND
     assert parser.get_symbol() is None
-    assert parser.get_dest() == "D"
-    assert parser.get_comp() == "M"
-    assert parser.get_jump() == "JGT"
+    assert parser.get_dest() == Dest.D
+    assert parser.get_comp() == Comp.m
+    assert parser.get_jump() == Jump.JGT
 
-    parser.advance()
+    parser.read_next_command()
     assert not parser.has_more_commands()
     assert parser.get_command_type() is None
     assert parser.get_symbol() is None

@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import TextIO
 
-from src.commandType import CommandType
+from src.commands import CommandType, Dest, Comp, Jump
 
 
 class Parser:
@@ -10,10 +10,10 @@ class Parser:
         # the components of the current command where the file cursor is currently
         self.__command_type: CommandType | None = None
         self.__symbol: str | None = None
-        self.__dest: str | None = None
-        self.__comp: str | None = None
-        self.__jump: str | None = None
-        self.advance()
+        self.__dest: Dest | None = None
+        self.__comp: Comp | None = None
+        self.__jump: Jump | None = None
+        self.read_next_command()
 
     def get_command_type(self) -> CommandType | None:
         return self.__command_type
@@ -21,13 +21,13 @@ class Parser:
     def get_symbol(self) -> str | None:
         return self.__symbol
 
-    def get_dest(self) -> str | None:
+    def get_dest(self) -> Dest | None:
         return self.__dest
 
-    def get_comp(self) -> str | None:
+    def get_comp(self) -> Comp | None:
         return self.__comp
 
-    def get_jump(self) -> str | None:
+    def get_jump(self) -> Jump | None:
         return self.__jump
 
     def has_more_commands(self) -> bool:
@@ -42,7 +42,7 @@ class Parser:
         self.__file.seek(current_position)
         return bool(next_line_cleaned)
 
-    def advance(self) -> None:
+    def read_next_command(self) -> None:
         current_line: str = self.__file.readline()
         current_line_cleaned: str = current_line.replace(" ", "").strip()
         while current_line.isspace() or current_line_cleaned.startswith("//"):
@@ -61,17 +61,17 @@ class Parser:
             self.__symbol = None
             if ";" in current_command and "=" not in current_command:
                 self.__dest = None
-                self.__comp = current_command.split(";")[0]
-                self.__jump = current_command.split(";")[1]
+                self.__comp = Comp(current_command.split(";")[0])
+                self.__jump = Jump(current_command.split(";")[1])
             elif ";" not in current_command and "=" in current_command:
-                self.__dest = current_command.split("=")[0]
-                self.__comp = current_command.split("=")[1]
+                self.__dest = Dest(current_command.split("=")[0])
+                self.__comp = Comp(current_command.split("=")[1])
                 self.__jump = None
             elif ";" in current_command and "=" in current_command:
-                self.__dest = current_command.split("=")[0]
+                self.__dest = Dest(current_command.split("=")[0])
                 string_after_equal_sign = current_command.split("=")[1]
-                self.__comp = string_after_equal_sign.split(";")[0]
-                self.__jump = string_after_equal_sign.split(";")[1]
+                self.__comp = Comp(string_after_equal_sign.split(";")[0])
+                self.__jump = Jump(string_after_equal_sign.split(";")[1])
         elif self.__command_type == CommandType.A_COMMAND:
             self.__dest = None
             self.__comp = None

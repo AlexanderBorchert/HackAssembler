@@ -18,9 +18,14 @@
     [project.optional-dependencies]
     dev = ["mypy", "pytest", "ruff"]
 
-    # Customize the `packages` option to ensure `src/hparser` is found
+    # Customize the `packages` option to ensure `src/parser` is found
     [tool.setuptools.packages.find]
     where = ["src", "tests"]
+
+    [tool.ruff]
+    lint.select = ["E", "F", "W", "C", "N"]  # Enable more error categories, D not contained
+    lint.fixable = ["ALL"] # Ensure Ruff fixes all fixable issues
+    preview = true
 
     [[tool.mypy.overrides]]
     module = ["pytest.*"]
