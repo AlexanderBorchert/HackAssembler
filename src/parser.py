@@ -82,6 +82,8 @@ class Parser:
     def __determine_command_type(command: str) -> CommandType:
         if command.startswith("@") and command[1:].isdigit():
             return CommandType.A_COMMAND
+        elif command.startswith('(') and command.endswith(')'):
+            return CommandType.A_COMMAND
         elif command.startswith("("):
             return CommandType.A_COMMAND
         else:
