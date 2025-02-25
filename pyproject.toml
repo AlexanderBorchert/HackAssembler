@@ -26,6 +26,7 @@
     lint.select = ["E", "F", "W", "C", "N"]  # Enable more error categories, D not contained
     lint.fixable = ["ALL"] # Ensure Ruff fixes all fixable issues
     preview = true
+    line-length = 120
 
     [[tool.mypy.overrides]]
     module = ["pytest.*"]
