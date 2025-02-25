@@ -8,7 +8,7 @@ class CommandType(Enum):
 
 
 class Dest(Enum):
-    null = "null"
+    Null = "null"
     M = "M"
     D = "D"
     MD = "MD"
@@ -19,7 +19,7 @@ class Dest(Enum):
 
 
 class Jump(Enum):
-    NONE = "null"
+    Null = "null"
     JGT = "JGT"
     JEQ = "JEQ"
     JGE = "JGE"
@@ -60,7 +60,7 @@ class Comp(Enum):
     one = "1"  # 1 was not possible
     minus_one = "-1"
     d = "D"
-    A = "A"
+    a = "A"
     not_d = "!D"
     not_a = "!A"
     minus_d = "-D"
@@ -72,7 +72,7 @@ class Comp(Enum):
     d_plus_a = "D+A"
     d_minus_a = "D-A"
     a_minus_d = "A-D"
-    a_and_d = "A&D"
+    d_and_a = "D&A"
     d_or_a = "D|A"
     m = "M"
     not_m = "!M"
@@ -83,3 +83,4 @@ class Comp(Enum):
     d_minus_m = "D-M"
     m_minus_d = "M-D"
     d_and_m = "D&M"
+    d_or_m = "D|M"
