@@ -9,6 +9,13 @@ repos:
     rev: v0.9.5    # or the appropriate tag from this repo
     hooks:
       - id: ruff
+        args: [
+                "--select=All",
+                "--ignore",
+                "--fix",
+                "--line-length=120",
+                "--preview",
+        ]
 
   - repo: local
     hooks:
