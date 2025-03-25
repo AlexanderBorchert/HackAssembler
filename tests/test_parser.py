@@ -1,70 +1,97 @@
-import typing
 from pathlib import Path
 
 import pytest
 
-from src.parser import Parser
-from src.commands import CommandType, Dest, Comp, Jump
+from src.commands import Command, A_Command, C_Command, Dest, Comp, Jump
+from src.parser import Parser, NoCommandsFoundError, InvalidSyntaxError
 
 
-@typing.no_type_check
-@pytest.fixture
-def test_asm_file(tmp_path: Path) -> Path:
-    filepath: Path = tmp_path / "test.asm"
-    filepath.write_text(
-        """
-        //comment
-        
-        @5
-        M  =  1 //comment
-        0;JMP
-        
-        D=M;JGT
-        
-        
-        """  # noqa:W293
-    )
-    return filepath
+def test_empty_file_raises_no_commands_found_error(
+        empty_asm_file: Path) -> None:
+    with pytest.raises(NoCommandsFoundError):
+        parser = Parser(empty_asm_file)
 
 
-def test_parser(test_asm_file: Path) -> None:
-    parser = Parser(test_asm_file)
+def test_only_whitespaces_raises_no_commands_error(
+        asm_file_containing_only_whitespace: Path) -> None:
+    with pytest.raises(NoCommandsFoundError):
+        parser = Parser(asm_file_containing_only_whitespace)
 
-    assert parser.has_more_commands()
-    assert parser.get_command_type() == CommandType.A_COMMAND
-    assert parser.get_symbol() == "5"
-    assert parser.get_dest() is None
-    assert parser.get_comp() is None
-    assert parser.get_jump() is None
 
-    parser.read_next_command()
-    assert parser.has_more_commands()
-    assert parser.get_command_type() == CommandType.C_COMMAND
-    assert parser.get_symbol() is None
-    assert parser.get_dest() == Dest.M
-    assert parser.get_comp() == Comp.one
-    assert parser.get_jump() is None
+def test_only_comment_raises_no_commands_error(
+        asm_file_containing_only_comment: Path) -> None:
+    with pytest.raises(NoCommandsFoundError):
+        parser = Parser(asm_file_containing_only_comment)
 
-    parser.read_next_command()
-    assert parser.has_more_commands()
-    assert parser.get_command_type() == CommandType.C_COMMAND
-    assert parser.get_symbol() is None
-    assert parser.get_dest() is None
-    assert parser.get_comp() == Comp.zero
-    assert parser.get_jump() == Jump.JMP
 
-    parser.read_next_command()
-    assert not parser.has_more_commands()
-    assert parser.get_command_type() == CommandType.C_COMMAND
-    assert parser.get_symbol() is None
-    assert parser.get_dest() == Dest.D
-    assert parser.get_comp() == Comp.m
-    assert parser.get_jump() == Jump.JGT
+def test_invalid_syntax_raises_error(
+        asm_file_containing_invalid_syntax: Path) -> None:
+    with pytest.raises(InvalidSyntaxError):
+        parser = Parser(asm_file_containing_invalid_syntax)
 
-    parser.read_next_command()
-    assert not parser.has_more_commands()
-    assert parser.get_command_type() is None
-    assert parser.get_symbol() is None
-    assert parser.get_dest() is None
-    assert parser.get_comp() is None
-    assert parser.get_jump() is None
+
+def test_A_Command(
+        asm_file_containing_A_Command: Path) -> None:
+    parser = Parser(asm_file_containing_A_Command)
+    current_command: Command = parser.get_current_command()
+    assert isinstance(current_command, A_Command), f"Expected type A_Command, but got {type(current_command).__name__}"
+    expected_address: str = "5"
+    assert current_command.address == expected_address, f"Expected address {expected_address}, but got {current_command.address}"
+
+
+def test_move_to_next_command(
+        asm_file_containing_two_commands: Path) -> None:
+    parser = Parser(asm_file_containing_two_commands)
+    current_command: Command = parser.get_current_command()
+    assert isinstance(current_command, A_Command)
+    assert current_command.address == "5"
+    assert parser.move_to_next_command()  # should be true because there is another command
+    current_command = parser.get_current_command()
+    assert isinstance(current_command, A_Command)
+    assert current_command.address == "6"
+    assert not parser.move_to_next_command()  # should be false because we're at the last command
+    current_command = parser.get_current_command()
+    assert isinstance(current_command, A_Command)
+    assert current_command.address == "6"
+
+
+def test_C_Command(
+        asm_file_containing_C_Command: Path) -> None:
+    parser = Parser(asm_file_containing_C_Command)
+    current_command: Command = parser.get_current_command()
+    assert isinstance(current_command, C_Command), f"Expected type C_Command, but got {type(current_command).__name__}"
+    assert current_command.dest == Dest.D
+    assert current_command.comp == Comp.m
+    assert current_command.jump == Jump.JGT
+
+
+def test_complex_file(
+        asm_file_containing_several_commands: Path) -> None:
+    parser = Parser(asm_file_containing_several_commands)
+
+    current_command: Command = parser.get_current_command()
+    assert isinstance(current_command, A_Command), f"Expected type A_Command, but got {type(current_command).__name__}"
+    assert current_command.address == "5"
+
+    assert parser.move_to_next_command()
+    current_command = parser.get_current_command()
+    assert isinstance(current_command, C_Command), f"Expected type C_Command, but got {type(current_command).__name__}"
+    assert current_command.dest == Dest.M
+    assert current_command.comp == Comp.one
+    assert current_command.jump == Jump.Null
+
+    assert parser.move_to_next_command()
+    current_command = parser.get_current_command()
+    assert isinstance(current_command, C_Command), f"Expected type C_Command, but got {type(current_command).__name__}"
+    assert current_command.dest == Dest.Null
+    assert current_command.comp == Comp.zero
+    assert current_command.jump == Jump.JMP
+
+    assert parser.move_to_next_command()
+    current_command = parser.get_current_command()
+    assert isinstance(current_command, C_Command), f"Expected type C_Command, but got {type(current_command).__name__}"
+    assert current_command.dest == Dest.D
+    assert current_command.comp == Comp.m
+    assert current_command.jump == Jump.JGT
+
+    assert not parser.move_to_next_command()  # there is no new command

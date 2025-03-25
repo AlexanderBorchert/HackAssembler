@@ -1,4 +1,29 @@
+from dataclasses import dataclass
 from enum import Enum
+from typing import Union
+
+Command = Union["A_Command", "L_Command", "C_Command"]
+
+
+@dataclass(frozen=True)
+class A_Command:
+    address: str
+
+    def __post_init__(self) -> None:
+        if not self.address.isdigit():
+            raise ValueError("Address must be a number")
+        
+
+@dataclass(frozen=True)
+class L_Command:
+    label: "Label"
+
+
+@dataclass(frozen=True)
+class C_Command:
+    dest: "Dest"
+    comp: "Comp"
+    jump: "Jump"
 
 
 class CommandType(Enum):

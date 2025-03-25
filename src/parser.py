@@ -1,90 +1,108 @@
 from pathlib import Path
 from typing import TextIO
 
-from src.commands import CommandType, Dest, Comp, Jump
+from src.commands import Dest, Comp, Jump, C_Command, A_Command, Command, L_Command, Label
 
 
 class Parser:
     def __init__(self, file_path: Path):
         self.__file: TextIO = open(file_path, "r")
-        # the components of the current command where the file cursor is currently
-        self.__command_type: CommandType | None = None
-        self.__symbol: str | None = None
-        self.__dest: Dest | None = None
-        self.__comp: Comp | None = None
-        self.__jump: Jump | None = None
-        self.read_next_command()
+        self.__current_command: Command
+        file_contains_command = self.move_to_next_command()
+        if not file_contains_command:
+            raise NoCommandsFoundError(file_path)
 
-    def get_command_type(self) -> CommandType | None:
-        return self.__command_type
+    def get_current_command(self) -> Command:
+        return self.__current_command
 
-    def get_symbol(self) -> str | None:
-        return self.__symbol
-
-    def get_dest(self) -> Dest | None:
-        return self.__dest
-
-    def get_comp(self) -> Comp | None:
-        return self.__comp
-
-    def get_jump(self) -> Jump | None:
-        return self.__jump
-
-    def has_more_commands(self) -> bool:
-        current_position = self.__file.tell()
+    def move_to_next_command(self) -> bool:
         next_line = self.__file.readline()
-        next_line_cleaned = next_line.replace(" ", "").strip()
-        while next_line != "" and (
-            next_line.isspace() or next_line_cleaned.startswith("//")
-        ):
+        while next_line != "":
+            command = self.__create_command(next_line)
+            if command is not None:
+                self.__current_command = command
+                return True
             next_line = self.__file.readline()
-            next_line_cleaned = next_line.replace(" ", "").strip()
-        self.__file.seek(current_position)
-        return bool(next_line_cleaned)
-
-    def read_next_command(self) -> None:
-        current_line: str = self.__file.readline()
-        current_line_cleaned: str = current_line.replace(" ", "").strip()
-        while current_line.isspace() or current_line_cleaned.startswith("//"):
-            current_line = self.__file.readline()
-            current_line_cleaned = current_line.replace(" ", "").strip()
-        current_command: str = current_line_cleaned.split("//")[0].strip()
-        if current_command == "":
-            self.__command_type = None
-            self.__symbol = None
-            self.__dest = None
-            self.__comp = None
-            self.__jump = None
-            return
-        self.__command_type = self.__determine_command_type(command=current_command)
-        if self.__command_type == CommandType.C_COMMAND:
-            self.__symbol = None
-            if ";" in current_command and "=" not in current_command:
-                self.__dest = None
-                self.__comp = Comp(current_command.split(";")[0])
-                self.__jump = Jump(current_command.split(";")[1])
-            elif ";" not in current_command and "=" in current_command:
-                self.__dest = Dest(current_command.split("=")[0])
-                self.__comp = Comp(current_command.split("=")[1])
-                self.__jump = None
-            elif ";" in current_command and "=" in current_command:
-                self.__dest = Dest(current_command.split("=")[0])
-                string_after_equal_sign = current_command.split("=")[1]
-                self.__comp = Comp(string_after_equal_sign.split(";")[0])
-                self.__jump = Jump(string_after_equal_sign.split(";")[1])
-        elif self.__command_type == CommandType.A_COMMAND:
-            self.__dest = None
-            self.__comp = None
-            self.__jump = None
-            self.__symbol = current_command.replace("@", "")
+        return False
 
     @staticmethod
-    def __determine_command_type(command: str) -> CommandType:
-        if command.startswith("@") and command[1:].isdigit():
-            return CommandType.A_COMMAND
-        elif command.startswith('(') and command.endswith(')'):
-            return CommandType.A_COMMAND
-        elif command.startswith("("):
-            return CommandType.A_COMMAND
+    def __create_command(line: str) -> Command | None:
+        cleaned_line = Parser.__delete_comments_and_spaces(line)
+        if cleaned_line == "":
+            return None
+        command: Command | None = Parser.__create_C_command(cleaned_line)
+        if command is None:
+            command = Parser.__create_A_command(cleaned_line)
+        if command is None:
+            command = Parser.__create_L_command(cleaned_line)
+        if command is None:
+            raise InvalidSyntaxError(line)
+        return command
+
+    @staticmethod
+    def __create_C_command(command: str) -> C_Command | None:
+        dest: Dest
+        comp: Comp
+        jump: Jump
+        if ";" in command and "=" not in command:
+            dest = Dest.Null
+            comp = Comp(command.split(";")[0])
+            jump = Jump(command.split(";")[1])
+            return C_Command(dest, comp, jump)
+        elif ";" not in command and "=" in command:
+            dest = Dest(command.split("=")[0])
+            comp = Comp(command.split("=")[1])
+            jump = Jump.Null
+            return C_Command(dest, comp, jump)
+        elif ";" in command and "=" in command:
+            dest = Dest(command.split("=")[0])
+            string_after_equal_sign = command.split("=")[1]
+            comp = Comp(string_after_equal_sign.split(";")[0])
+            jump = Jump(string_after_equal_sign.split(";")[1])
+            return C_Command(dest, comp, jump)
         else:
-            return CommandType.C_COMMAND
+            return None
+
+    @staticmethod
+    def __create_A_command(command: str) -> A_Command | None:
+        if command.startswith("@") and command[1:].isdigit():
+            address: str = command.replace("@", "")
+            return A_Command(address)
+        else:
+            return None
+
+    @staticmethod
+    def __create_L_command(command: str) -> L_Command | None:
+        if command.startswith('(') and command.endswith(')'):
+            return L_Command(Label.R0)
+        else:
+            return None
+
+    @staticmethod
+    def __delete_comments_and_spaces(raw_string: str) -> str:
+        string_without_comments = raw_string.split('//', 1)[0]
+        cleaned_string = string_without_comments.replace(" ", "").strip()
+        return cleaned_string
+
+
+class NoCommandsFoundError(Exception):
+    """Raised when the assembler file does not contain any parseable commands."""
+    def __init__(self, filepath: Path):
+        super().__init__(
+            f"""
+            No commands found in file: {filepath.name}.
+            Full path: {filepath.as_uri()}
+            """
+        )
+        self.filepath = filepath
+        
+
+class InvalidSyntaxError(Exception):
+    """Raised when the syntax is invalid ."""
+    def __init__(self, line: str):
+        super().__init__(
+            f"""
+            Invalid syntax: {line}.
+            """
+        )
+        self.line = line

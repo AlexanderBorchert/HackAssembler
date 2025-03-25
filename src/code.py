@@ -1,20 +1,19 @@
-from src.commands import Dest, Jump, Label, Comp
+from src.commands import Dest, Jump, Label, Comp, Command, A_Command, C_Command
 
 
-def translate_command_into_binary_code(command: Dest | Jump | Label | Comp) -> str:
-    if isinstance(command, Dest):
-        return translate_dest_to_binary(command)
-    elif isinstance(command, Jump):
-        return translate_jump_to_binary(command)
-    elif isinstance(command, Label):
-        return translate_label_to_binary(command)
-    elif isinstance(command, Comp):
-        return translate_comp_to_binary(command)
+def translate_command_into_binary_code(command: Command) -> str:
+    if isinstance(command, A_Command):
+        return __translate_address_to_binary(command.address)
+    if isinstance(command, C_Command):
+        comp: str = __translate_comp_to_binary(command.comp)
+        dest: str = __translate_dest_to_binary(command.dest)
+        jump: str = __translate_jump_to_binary(command.jump)
+        return "111" + comp + dest + jump
     else:
-        raise ValueError("Invalid command type")
+        raise ValueError(f"Command {command} is not an A_Command or a C_Command")
 
 
-def translate_dest_to_binary(dest: Dest) -> str:
+def __translate_dest_to_binary(dest: Dest) -> str:
     dest_map = {
         Dest.Null: "000",
         Dest.M: "001",
@@ -28,7 +27,7 @@ def translate_dest_to_binary(dest: Dest) -> str:
     return dest_map[dest]
 
 
-def translate_jump_to_binary(jump: Jump) -> str:
+def __translate_jump_to_binary(jump: Jump) -> str:
     jump_map = {
         Jump.Null: "000",
         Jump.JGT: "001",
@@ -42,13 +41,15 @@ def translate_jump_to_binary(jump: Jump) -> str:
     return jump_map[jump]
 
 
-def translate_label_to_binary(label: Label) -> str:
-    # Example binary encoding for labels
-    # Labels would depend on your implementation (dummy example here)
+def __translate_label_to_binary(label: Label) -> str:
     return format(label.value, '016b')  # Assume label has a 'value' attribute
 
 
-def translate_comp_to_binary(comp: Comp) -> str:
+def __translate_address_to_binary(address: str) -> str:
+    return bin(int(address))[2:].zfill(16)
+
+
+def __translate_comp_to_binary(comp: Comp) -> str:
     comp_map = {
         Comp.zero: "0101010",
         Comp.one: "0111111",

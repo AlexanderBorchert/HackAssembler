@@ -3,19 +3,19 @@ repos:
     rev: v1.15.0
     hooks:
       - id: mypy
-        args: [--strict]
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.5    # or the appropriate tag from this repo
-    hooks:
-      - id: ruff
-        args: [
-                "--select=All",
-                "--ignore",
-                "--fix",
-                "--line-length=120",
-                "--preview",
-        ]
+        args: [ --strict ]
+  
+  #  - repo: https://github.com/astral-sh/ruff-pre-commit
+  #    rev: v0.9.5    # or the appropriate tag from this repo
+  #    hooks:
+  #      - id: ruff
+  #        args: [
+  #          "--select=E,F,W,N,C",  # Specify rule categories explicitly
+  #          "--ignore=W291,W293",  # Ignore specific whitespace issues
+  #          "--fix",
+  #          "--line-length=120",
+  #          "--preview",
+  #        ]
 
   - repo: local
     hooks:

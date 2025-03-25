@@ -3,14 +3,14 @@ import typing
 import pytest
 
 from src.code import translate_command_into_binary_code
-from src.commands import Comp, Dest, Jump
+from src.commands import Comp, Dest, Jump, C_Command, A_Command
 
 
 @typing.no_type_check
 @pytest.mark.parametrize(
-    "command, expected_binary_code",
+    "comp, expected_comp_binary_code",
     [
-        pytest.param(Comp.zero, "0101010", id="Comp.zero"),
+        (Comp.zero, "0101010"),
         (Comp.one, "0111111"),
         (Comp.minus_one, "0111010"),
         (Comp.d, "0001100"),
@@ -39,7 +39,20 @@ from src.commands import Comp, Dest, Jump
         (Comp.m_minus_d, "1000111"),
         (Comp.d_and_m, "1000000"),
         (Comp.d_or_m, "1010101"),
+    ]
+)
+def test_C_Command_comp(comp: Comp, expected_comp_binary_code: str) -> None:
+    command: C_Command = C_Command(comp=comp, dest=Dest.Null, jump=Jump.Null)
+    command_in_binary_code = translate_command_into_binary_code(command)
+    expected_binary_code: str = "111" + expected_comp_binary_code + "000" + "000"
+    assert command_in_binary_code == expected_binary_code
 
+
+@typing.no_type_check
+@pytest.mark.parametrize(
+    "dest, expected_dest_binary_code",
+    [
+        (Dest.Null, "000"),
         (Dest.Null, "000"),
         (Dest.M, "001"),
         (Dest.D, "010"),
@@ -48,7 +61,20 @@ from src.commands import Comp, Dest, Jump
         (Dest.AM, "101"),
         (Dest.AD, "110"),
         (Dest.AMD, "111"),
+    ]
+)
+def test_C_Command_dest(dest: Dest, expected_dest_binary_code: str) -> None:
+    command: C_Command = C_Command(comp=Comp.zero, dest=dest, jump=Jump.Null)
+    command_in_binary_code = translate_command_into_binary_code(command)
+    comp_zero_binary_code: str = "0101010"
+    expected_binary_code: str = "111" + comp_zero_binary_code + expected_dest_binary_code + "000"
+    assert command_in_binary_code == expected_binary_code
 
+
+@typing.no_type_check
+@pytest.mark.parametrize(
+    "jump, expected_jump_binary_code",
+    [
         (Jump.Null, "000"),
         (Jump.JGT, "001"),
         (Jump.JEQ, "010"),
@@ -57,8 +83,31 @@ from src.commands import Comp, Dest, Jump
         (Jump.JNE, "101"),
         (Jump.JLE, "110"),
         (Jump.JMP, "111"),
+    ]
+)
+def test_C_Command_jump(jump: Jump, expected_jump_binary_code: str) -> None:
+    command: C_Command = C_Command(comp=Comp.zero, dest=Dest.Null, jump=jump)
+    command_in_binary_code = translate_command_into_binary_code(command)
+    expected_binary_code: str = "111" + "0101010" + "000" + expected_jump_binary_code
+    assert command_in_binary_code == expected_binary_code
+
+
+@typing.no_type_check
+@pytest.mark.parametrize(
+    "address, expected_binary_code",
+    [
+        ("0", "0000000000000000"),
+        ("1", "0000000000000001"),
+        ("2", "0000000000000010"),
+        ("3", "0000000000000011"),
+        ("4", "0000000000000100"),
+        ("0", "0000000000000000"),
+        ("32766", "0111111111111110"),
+        ("32767", "0111111111111111"),
 
     ]
 )
-def test_translate_command_into_binary_code(command: Comp, expected_binary_code: str) -> None:
-    assert translate_command_into_binary_code(command) == expected_binary_code
+def test_A_Command(address: str, expected_binary_code: str) -> None:
+    command: A_Command = A_Command(address=address)
+    command_in_binary_code = translate_command_into_binary_code(command)
+    assert command_in_binary_code == expected_binary_code
