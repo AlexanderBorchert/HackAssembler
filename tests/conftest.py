@@ -48,7 +48,7 @@ def asm_file_containing_invalid_syntax(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def asm_file_containing_A_Command(tmp_path: Path) -> Path:
+def asm_file_containing_a_command(tmp_path: Path) -> Path:
     filepath: Path = tmp_path / "test.asm"
     filepath.write_text(
         """
@@ -59,7 +59,7 @@ def asm_file_containing_A_Command(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
-def asm_file_containing_C_Command(tmp_path: Path) -> Path:
+def asm_file_containing_c_command(tmp_path: Path) -> Path:
     filepath: Path = tmp_path / "test.asm"
     filepath.write_text(
         """

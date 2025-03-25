@@ -1,36 +1,36 @@
-    [build-system]
-    requires = ["setuptools>=75.8.0", "wheel"]
-    build-backend = "setuptools.build_meta"
+[build-system]
+requires = ["setuptools>=75.8.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
-    [project]
-    name = "hackassembler"
-    version = "0.1.0"
-    description = "Add your description here"
-    requires-python = ">=3.9"
-    dependencies = [
-        "mypy>=1.15.0",
-        "pre-commit>=4.1.0",
-        "pytest>=8.3.4",
-        "ruff>=0.9.5",
-        "setuptools>=75.8.0",
+[project]
+name = "hackassembler"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.9"
+dependencies = [
+    "mypy>=1.15.0",
+    "pre-commit>=4.1.0",
+    "pytest>=8.3.4",
+    "ruff>=0.9.5",
+    "setuptools>=75.8.0",
 ]
 
-    [project.optional-dependencies]
-    dev = ["mypy", "pytest", "ruff"]
+[project.optional-dependencies]
+dev = ["mypy", "pytest", "ruff"]
 
-    # Customize the `packages` option to ensure `src/parser` is found
-    [tool.setuptools.packages.find]
-    where = ["src", "tests"]
+# Customize the `packages` option to ensure `src/parser` is found
+[tool.setuptools.packages.find]
+where = ["src", "tests"]
 
-    [tool.ruff]
-    lint.select = ["E", "F", "W", "C", "N"]  # Enable more error categories, D not contained
-    lint.fixable = ["ALL"] # Ensure Ruff fixes all fixable issues
-    preview = true
-    line-length = 120
-    lint.ignore = ["W291", "W293"]
-    # Ignore whitespace issues: W291 = trailing whitespace, W293 = blank line has spaces
-    # at the moment: when I go to next line cursor will jump to left which is not wanted
+[tool.ruff]
+lint.select = ["E", "F", "W", "C", "N"]  # Enable more error categories, D not contained
+lint.fixable = ["ALL"] # Ensure Ruff fixes all fixable issues
+preview = true
+line-length = 120
+lint.ignore = ["W291", "W293"]
+# Ignore whitespace issues: W291 = trailing whitespace, W293 = blank line has spaces
+# at the moment: when I go to next line cursor will jump to left which is not wanted
 
-    [[tool.mypy.overrides]]
-    module = ["pytest.*"]
-    ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = ["pytest.*"]
+ignore_missing_imports = true

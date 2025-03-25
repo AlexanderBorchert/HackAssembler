@@ -30,17 +30,17 @@ class Parser:
         cleaned_line = Parser.__delete_comments_and_spaces(line)
         if cleaned_line == "":
             return None
-        command: Command | None = Parser.__create_C_command(cleaned_line)
+        command: Command | None = Parser.__create_c_command(cleaned_line)
         if command is None:
-            command = Parser.__create_A_command(cleaned_line)
+            command = Parser.__create_a_command(cleaned_line)
         if command is None:
-            command = Parser.__create_L_command(cleaned_line)
+            command = Parser.__create_l_command(cleaned_line)
         if command is None:
             raise InvalidSyntaxError(line)
         return command
 
     @staticmethod
-    def __create_C_command(command: str) -> C_Command | None:
+    def __create_c_command(command: str) -> C_Command | None:
         dest: Dest
         comp: Comp
         jump: Jump
@@ -64,7 +64,7 @@ class Parser:
             return None
 
     @staticmethod
-    def __create_A_command(command: str) -> A_Command | None:
+    def __create_a_command(command: str) -> A_Command | None:
         if command.startswith("@") and command[1:].isdigit():
             address: str = command.replace("@", "")
             return A_Command(address)
@@ -72,7 +72,7 @@ class Parser:
             return None
 
     @staticmethod
-    def __create_L_command(command: str) -> L_Command | None:
+    def __create_l_command(command: str) -> L_Command | None:
         if command.startswith('(') and command.endswith(')'):
             return L_Command(Label.R0)
         else:

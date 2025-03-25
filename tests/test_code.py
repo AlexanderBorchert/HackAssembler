@@ -41,7 +41,7 @@ from src.commands import Comp, Dest, Jump, C_Command, A_Command
         (Comp.d_or_m, "1010101"),
     ]
 )
-def test_C_Command_comp(comp: Comp, expected_comp_binary_code: str) -> None:
+def test_c_command_comp(comp: Comp, expected_comp_binary_code: str) -> None:
     command: C_Command = C_Command(comp=comp, dest=Dest.Null, jump=Jump.Null)
     command_in_binary_code = translate_command_into_binary_code(command)
     expected_binary_code: str = "111" + expected_comp_binary_code + "000" + "000"
@@ -63,7 +63,7 @@ def test_C_Command_comp(comp: Comp, expected_comp_binary_code: str) -> None:
         (Dest.AMD, "111"),
     ]
 )
-def test_C_Command_dest(dest: Dest, expected_dest_binary_code: str) -> None:
+def test_c_command_dest(dest: Dest, expected_dest_binary_code: str) -> None:
     command: C_Command = C_Command(comp=Comp.zero, dest=dest, jump=Jump.Null)
     command_in_binary_code = translate_command_into_binary_code(command)
     comp_zero_binary_code: str = "0101010"
@@ -85,7 +85,7 @@ def test_C_Command_dest(dest: Dest, expected_dest_binary_code: str) -> None:
         (Jump.JMP, "111"),
     ]
 )
-def test_C_Command_jump(jump: Jump, expected_jump_binary_code: str) -> None:
+def test_c_command_jump(jump: Jump, expected_jump_binary_code: str) -> None:
     command: C_Command = C_Command(comp=Comp.zero, dest=Dest.Null, jump=jump)
     command_in_binary_code = translate_command_into_binary_code(command)
     expected_binary_code: str = "111" + "0101010" + "000" + expected_jump_binary_code
@@ -107,7 +107,7 @@ def test_C_Command_jump(jump: Jump, expected_jump_binary_code: str) -> None:
 
     ]
 )
-def test_A_Command(address: str, expected_binary_code: str) -> None:
+def test_a_command(address: str, expected_binary_code: str) -> None:
     command: A_Command = A_Command(address=address)
     command_in_binary_code = translate_command_into_binary_code(command)
     assert command_in_binary_code == expected_binary_code
