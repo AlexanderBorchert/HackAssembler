@@ -1,12 +1,25 @@
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Generator, TextIO
-
+import sys
+from pathlib import Path
 from hackassembler.code import translate_command_into_binary_code
 from hackassembler.commands import Command, PredefinedLabel, LCommand, ACommand
 from hackassembler.parser import Parser
 
 
+def main() -> None:
+    if len(sys.argv) != 2:  # Expect exactly one argument
+        print("Usage: hackassemble <path-to-asm-file>")
+        sys.exit(1)
+    assembler_file_path = Path(sys.argv[1])
+    try:
+        assemble(assembler_file_path)
+        print(f"Successfully assembled: {assembler_file_path}")
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+        
+        
 def assemble(assembler_file_path: str | Path) -> None:
     parser: Parser
     with __prepare_assembler_context(assembler_file_path) as (parser, binary_file):  
@@ -35,10 +48,8 @@ def __prepare_assembler_context(file_path: str | Path) -> Generator[tuple[Parser
     binary_file = open(binary_file_path, "w")
 
     try:
-        # Yield both resources to the calling function (e.g., assemble)
         yield parser, binary_file
     finally:
-        # Cleanup: Close binary file and ensure Parser cleanup
         binary_file.close()
         parser.__exit__(None, None, None)  # Clean up Parser (if it implements __exit__)
 

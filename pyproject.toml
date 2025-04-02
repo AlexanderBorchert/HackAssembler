@@ -21,6 +21,9 @@ dev = [
     "pre-commit>=4.1.0"
 ]
 
+[project.scripts]
+hackassemble = "hackassembler.assembler:main"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["hackassembler*"]
