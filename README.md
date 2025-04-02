@@ -1,16 +1,48 @@
 # Hack Assembler
 
-A Python implementation of the Hack Assembler for converting **Hack Assembly code** into binary **machine code**.
-The assembler is designed as part of the **Nand2Tetris course/project**, and it translates `.asm` files into `.hack`
-files that can run on the Hack CPU.
+A Python implementation of the Hack Assembler for converting **Hack Assembly code** into binary **machine code**.  
+The assembler is designed as part of the [**Nand2Tetris course**](https://www.nand2tetris.org/). It translates `.asm`
+files into `.hack` files that can run on the [**Hack CPU**](https://nand2tetris.github.io/web-ide/chip/).
 
-## **Features**
+---
 
-- Parses `.asm` files with support for:
-- Generates `.hack` machine code files.
-- Modular, extensible code structure:
-    - Separate `parser`, `assembler`, and `code` modules.
-- Comprehensive test suite with `pytest`.
+## **Usage**
+
+To use the assembler, provide a Hack assembly file (`.asm`) as input. The assembler will generate the corresponding
+binary machine code (`.hack`) file in the same directory.
+
+### **Example**
+
+1. Create a Hack assembly file, e.g., `example.asm`:
+   ```asm
+   // This file adds the numbers 1 + 2
+   @1
+   D=A
+   @2
+   D=D+A
+   @0
+   M=D
+   ```
+
+2. Install the program:
+   ```bash
+   pip install hackassembler
+   ```
+
+3. Run the assembler:
+   ```bash
+   hackassemble example.asm
+   ```
+
+4. The corresponding `example.hack` file will be created:
+   ```hack
+   0000000000000001
+   1110110000010000
+   0000000000000010
+   1110000010010000
+   0000000000000000
+   1110001100001000
+   ```
 
 ---
 
@@ -18,7 +50,7 @@ files that can run on the Hack CPU.
 
 ```plaintext
 HackAssembler/
-├── src/
+├── hackassembler/
 │   ├── assembler.py   # Assembler logic (high-level translation control)
 │   ├── parser.py      # Parses `.asm` files into commands
 │   ├── commands.py    # Dataclasses and Enums for assembly commands
@@ -28,7 +60,7 @@ HackAssembler/
 │   ├── test_parser.py     # Tests for the parser
 │   ├── test_code.py       # Tests for binary translation
 │   ├── conftest.py        # Fixtures for testing
-├── .pre-commit-config.yaml  # Pre-commit hooks for linting and formatting
+├── .pre-commit-config.yaml  # Pre-commit hooks for linting & formatting
 ├── pyproject.toml          # Project configuration (dependencies, metadata)
 └── README.md               # Project readme (this file)
 ```
@@ -39,23 +71,21 @@ HackAssembler/
 
 - **Python**: `>=3.9`
 - Optional dependencies:
-    - `mypy`
-    - `pytest`
-    - `ruff`
-    - `setuptools`
-
-All dependencies are managed through `pyproject.toml`.
+    - `mypy`: Static type checking
+    - `pytest`: Testing framework
+    - `ruff`: Linting & formatting
+    - `setuptools`: Project packaging
 
 ---
 
-## **Setup**
+## **Development**
 
 Follow these steps to set up the project locally:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/hack-assembler.git
-   cd hack-assembler
+   git clone https://github.com/AlexanderBorchert/HackAssembler.git
+   cd hackassembler
    ```
 
 2. **Install Dependencies**:
@@ -64,7 +94,7 @@ Follow these steps to set up the project locally:
    pip install -r requirements.txt
    ```
 
-   Or using `pip` with `pyproject.toml`:
+   Or, install the package using `pyproject.toml`:
    ```bash
    pip install .
    ```
@@ -82,58 +112,13 @@ Follow these steps to set up the project locally:
 
 ---
 
-## **Usage**
-
-To use the assembler, you can pass a Hack assembly file (`.asm`) as input. The assembler will generate the corresponding
-machine code (`.hack`) file in the same directory.
-
-### **Example**
-
-1. Create a Hack assembly file, e.g., `example.asm`:
-   ```asm
-   // This file adds the numbers 1 + 2
-   @1
-   D=A
-   @2
-   D=D+A
-   @0
-   M=D
-   ```
-
-2. Run the assembler:
-   ```bash
-   python src/main.py example.asm
-   ```
-
-3. The corresponding `example.hack` file will be created:
-   ```hack
-   0000000000000001
-   1110110000010000
-   0000000000000010
-   1110000010010000
-   0000000000000000
-   1110001100001000
-   ```
-
----
-
-## **Development**
-
-### **Running Tests**
-
-The project uses `pytest` for unit testing. Run all tests with:
-
-```bash
-pytest
-```
-
 ### **Linting**
 
 Code quality is enforced using `ruff` and type-checked with `mypy`. Run:
 
 ```bash
-ruff check src/
-mypy src/
+ruff check .
+mypy .
 ```
 
 To auto-fix formatting issues:
@@ -141,5 +126,3 @@ To auto-fix formatting issues:
 ```bash
 ruff --fix .
 ```
-
----
