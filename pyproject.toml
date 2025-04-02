@@ -1,5 +1,5 @@
 [project]
-name = "hackassembler"
+name = "hackassembler-cli"
 version = "0.1.0"
 description = "A Hack assembler for the Nand2Tetris project."
 authors = [

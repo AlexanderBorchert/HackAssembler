@@ -26,7 +26,7 @@ binary machine code (`.hack`) file in the same directory.
 
 2. Install the program:
    ```bash
-   pip install hackassembler
+   pip install hackassembler-cli
    ```
 
 3. Run the assembler:
