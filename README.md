@@ -116,13 +116,13 @@ Follow these steps to set up the project locally:
 
 Code quality is enforced using `ruff` and type-checked with `mypy`. Run:
 
-```bash
-ruff check .
-mypy .
-```
+   ```bash
+   ruff check .
+   mypy .
+   ```
 
 To auto-fix formatting issues:
 
-```bash
-ruff --fix .
-```
+   ```bash
+   ruff --fix .
+   ```
