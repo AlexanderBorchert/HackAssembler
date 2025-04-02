@@ -1,14 +1,29 @@
-from src.commands import Dest, Jump, Label, Comp, Command, A_Command, C_Command
+from typing import Optional
+
+from src.commands import Dest, Jump, Comp, Command, ACommand, CCommand, LCommand
 
 
-def translate_command_into_binary_code(command: Command) -> str:
-    if isinstance(command, A_Command):
-        return __translate_address_to_binary(command.address)
-    if isinstance(command, C_Command):
+def translate_command_into_binary_code(command: Command, symbol_table: Optional[dict[str, str]] = None) -> str:
+    if isinstance(command, ACommand):
+        address: str = ""
+        if command.symbol_address is not None:
+            if symbol_table is None:
+                raise ValueError("Symbolic table is missing. Cannot translate symbolic address to binary code.")
+            if command.symbol_address not in symbol_table:
+                raise ValueError(f"symbolic address {command.symbol_address} is not defined")
+            address = symbol_table[command.symbol_address]
+        else:
+            if command.raw_address is None:
+                raise ValueError("A A_Command must have either symbolicAddress or rawAddress")
+            address = command.raw_address
+        return __translate_address_to_binary(address)
+    if isinstance(command, CCommand):
         comp: str = __translate_comp_to_binary(command.comp)
         dest: str = __translate_dest_to_binary(command.dest)
         jump: str = __translate_jump_to_binary(command.jump)
         return "111" + comp + dest + jump
+    if isinstance(command, LCommand):  # saves extra case in assembler
+        return ""
     else:
         raise ValueError(f"Command {command} is not an A_Command or a C_Command")
 
@@ -39,10 +54,6 @@ def __translate_jump_to_binary(jump: Jump) -> str:
         Jump.JMP: "111",
     }
     return jump_map[jump]
-
-
-def __translate_label_to_binary(label: Label) -> str:
-    return format(label.value, '016b')  # Assume label has a 'value' attribute
 
 
 def __translate_address_to_binary(address: str) -> str:

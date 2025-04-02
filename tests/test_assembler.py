@@ -1,3 +1,5 @@
+# type: ignore
+
 import typing
 from pathlib import Path
 import pytest
@@ -64,56 +66,43 @@ def test_assemble_wrong_syntax(test_file_with_wrong_syntax: Path) -> None:
         )
 
 
-test_cases_simple_files: typing.List[typing.Tuple[str, str]] = [
-    # ("@5", "0000000000000101"),
-    # ("D=A", "1110110000010000"),
-    # ("M=D", "1110001100001000"),
-    # ("0;JMP", "1110101010000111"),
-    ("@5\nD=A", "0000000000000101\n1110110000010000"),
-
-]
-
-
 @typing.no_type_check
-@pytest.fixture
+@pytest.mark.parametrize(
+    "input_asm_code, expected_hack_code", 
+    [
+        ("@5", "0000000000000101"),
+        ("D=A", "1110110000010000"),
+        ("M=D", "1110001100001000"),
+        ("0;JMP", "1110101010000111"),
+        ("@i", "0000000000010000"),
+        ("M=1 //i=1", "1110111111001000"),
+        ("M=0", "1110101010001000"),
+        ("D=M", "1111110000010000"),
+        ("@100", "0000000001100100"),
+        ("D=D-A", "1110010011010000"),
+        ("D;JGT", "1110001100000001"),
+        
+        
+        ("M=D+M", "1111000010001000"),
+        ("M=M+1", "1111110111001000"),
+        ("0;JMP", "1110101010000111"),
+        ("@5\nD=A", "0000000000000101\n1110110000010000"),
+    ]
+)  # type: ignore
 def test_assemble_simple_files(input_asm_code: str, expected_hack_code: str, tmp_path: Path) -> None:
-    filepath_expected_file: Path = tmp_path / "expected.hack"
+    filepath_expected_file = tmp_path / "expected.hack"
     filepath_expected_file.write_text(expected_hack_code)
-    filepath_input_file: Path = tmp_path / "input.asm"
+    filepath_input_file = tmp_path / "input.asm"
     filepath_input_file.write_text(input_asm_code)
     assemble(filepath_input_file)
-    filepath_output_file: Path = filepath_input_file.with_suffix(".hack")
-    assert (open(filepath_expected_file, "r", encoding="utf-8").read() 
+    filepath_output_file = filepath_input_file.with_suffix(".hack")
+    assert (filepath_expected_file.read_text(encoding="utf-8") 
+            == filepath_output_file.read_text(encoding="utf-8"))
+
+
+def test_assemble_containing_everything(asm_file_containing_everything: Path, 
+                                        expected_output_containing_everything: Path) -> None:
+    assemble(asm_file_containing_everything)
+    filepath_output_file: Path = asm_file_containing_everything.with_suffix(".hack")
+    assert (open(expected_output_containing_everything, "r", encoding="utf-8").read() 
             == open(filepath_output_file, "r", encoding="utf-8").read())
-
-
-# @typing.no_type_check
-# @pytest.fixture
-# def test_asm_file(tmp_path: Path) -> Path:
-#     filepath: Path = tmp_path / "test.asm"
-#     filepath.write_text(
-#         """
-#         """  # noqa:W293
-#     )
-#     return filepath
-#
-#
-# def test_assemble(test_asm_file: Path) -> None:
-#     assembler(test_asm_file)
-#     # check that there is a file with path like test_asm_file but just extension has .hack instead of .asm
-#     #     assert parser.has_more_commands()
-
-
-# """
-# //comment
-#
-# @5
-# M  =  1 //comment
-# 0;JMP
-#
-# D=M;JGT
-#
-#
-# """  # noqa:W293
-
-# assert open(file_path_1, "r", encoding="utf-8").read() == open(file_path_2, "r", encoding="utf-8").read()

@@ -1,26 +1,30 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Union
+from typing import Union, Optional
 
-Command = Union["A_Command", "L_Command", "C_Command"]
+Command = Union["ACommand", "LCommand", "CCommand"]
 
 
 @dataclass(frozen=True)
-class A_Command:
-    address: str
-
+class ACommand:
+    raw_address: Optional[str] = None
+    symbol_address: Optional[str] = None
+    
     def __post_init__(self) -> None:
-        if not self.address.isdigit():
-            raise ValueError("Address must be a number")
+        if (self.raw_address is None and self.symbol_address is None) or \
+           (self.raw_address is not None and self.symbol_address is not None):
+            raise ValueError("Exactly one of 'rawAddress' or 'symbolicAddress' must be provided, not none or both.")
+        if self.raw_address is not None and not self.raw_address.isdigit():
+            raise ValueError("Raw Address must be a number")
         
 
 @dataclass(frozen=True)
-class L_Command:
-    label: "Label"
+class LCommand:
+    label: str
 
 
 @dataclass(frozen=True)
-class C_Command:
+class CCommand:
     dest: "Dest"
     comp: "Comp"
     jump: "Jump"
@@ -54,7 +58,7 @@ class Jump(Enum):
     JMP = "JMP"
 
 
-class Label(Enum):
+class PredefinedLabel(Enum):
     SP = "SP"
     LCL = "LCL"
     ARG = "ARG"

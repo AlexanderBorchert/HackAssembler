@@ -1,9 +1,11 @@
+# type: ignore
+
 import typing
 
 import pytest
 
 from src.code import translate_command_into_binary_code
-from src.commands import Comp, Dest, Jump, C_Command, A_Command
+from src.commands import Comp, Dest, Jump, CCommand, ACommand, LCommand
 
 
 @typing.no_type_check
@@ -42,7 +44,7 @@ from src.commands import Comp, Dest, Jump, C_Command, A_Command
     ]
 )
 def test_c_command_comp(comp: Comp, expected_comp_binary_code: str) -> None:
-    command: C_Command = C_Command(comp=comp, dest=Dest.Null, jump=Jump.Null)
+    command: CCommand = CCommand(comp=comp, dest=Dest.Null, jump=Jump.Null)
     command_in_binary_code = translate_command_into_binary_code(command)
     expected_binary_code: str = "111" + expected_comp_binary_code + "000" + "000"
     assert command_in_binary_code == expected_binary_code
@@ -64,7 +66,7 @@ def test_c_command_comp(comp: Comp, expected_comp_binary_code: str) -> None:
     ]
 )
 def test_c_command_dest(dest: Dest, expected_dest_binary_code: str) -> None:
-    command: C_Command = C_Command(comp=Comp.zero, dest=dest, jump=Jump.Null)
+    command: CCommand = CCommand(comp=Comp.zero, dest=dest, jump=Jump.Null)
     command_in_binary_code = translate_command_into_binary_code(command)
     comp_zero_binary_code: str = "0101010"
     expected_binary_code: str = "111" + comp_zero_binary_code + expected_dest_binary_code + "000"
@@ -86,10 +88,26 @@ def test_c_command_dest(dest: Dest, expected_dest_binary_code: str) -> None:
     ]
 )
 def test_c_command_jump(jump: Jump, expected_jump_binary_code: str) -> None:
-    command: C_Command = C_Command(comp=Comp.zero, dest=Dest.Null, jump=jump)
+    command: CCommand = CCommand(comp=Comp.zero, dest=Dest.Null, jump=jump)
     command_in_binary_code = translate_command_into_binary_code(command)
     expected_binary_code: str = "111" + "0101010" + "000" + expected_jump_binary_code
     assert command_in_binary_code == expected_binary_code
+
+
+def test_l_command() -> None:
+    command: LCommand = LCommand(label="label")
+    command_in_binary_code = translate_command_into_binary_code(command)
+    assert command_in_binary_code == ""
+
+
+def test_a_command_symbol_address() -> None:
+    symbol_table = {"Loop": "2", "End": "5"}
+    command: ACommand = ACommand(symbol_address="Loop")
+    command_in_binary_code = translate_command_into_binary_code(command=command, symbol_table=symbol_table)
+    assert command_in_binary_code == "0000000000000010"
+    command = ACommand(symbol_address="End")
+    command_in_binary_code = translate_command_into_binary_code(command=command, symbol_table=symbol_table)
+    assert command_in_binary_code == "0000000000000101"
 
 
 @typing.no_type_check
@@ -107,7 +125,7 @@ def test_c_command_jump(jump: Jump, expected_jump_binary_code: str) -> None:
 
     ]
 )
-def test_a_command(address: str, expected_binary_code: str) -> None:
-    command: A_Command = A_Command(address=address)
+def test_a_command_raw_address(address: str, expected_binary_code: str) -> None:
+    command: ACommand = ACommand(raw_address=address)
     command_in_binary_code = translate_command_into_binary_code(command)
     assert command_in_binary_code == expected_binary_code
