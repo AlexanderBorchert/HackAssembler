@@ -3,8 +3,8 @@
 import typing
 from pathlib import Path
 import pytest
-from src.assembler import assemble
-from src.parser import InvalidSyntaxError
+from hackassembler.assembler import assemble
+from hackassembler.parser import InvalidSyntaxError
 
 
 def test_assemble_missing_input_file() -> None:

@@ -2,14 +2,14 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Generator, TextIO
 
-from src.code import translate_command_into_binary_code
-from src.commands import Command, PredefinedLabel, LCommand, ACommand
-from src.parser import Parser
+from hackassembler.code import translate_command_into_binary_code
+from hackassembler.commands import Command, PredefinedLabel, LCommand, ACommand
+from hackassembler.parser import Parser
 
 
 def assemble(assembler_file_path: str | Path) -> None:
     parser: Parser
-    with _prepare_assembler_context(assembler_file_path) as (parser, binary_file):  
+    with __prepare_assembler_context(assembler_file_path) as (parser, binary_file):  
         # read with parser from assembler file and write the respective machine code to binary_file
         symbol_table: dict[str, str] = __create_symbol_table(parser)
         parser.move_to_first_command()
@@ -24,7 +24,7 @@ def assemble(assembler_file_path: str | Path) -> None:
 
 
 @contextmanager
-def _prepare_assembler_context(file_path: str | Path) -> Generator[tuple[Parser, TextIO], None, None]:
+def __prepare_assembler_context(file_path: str | Path) -> Generator[tuple[Parser, TextIO], None, None]:
     if isinstance(file_path, str):
         file_path = Path(file_path)
     __validate_input(file_path)

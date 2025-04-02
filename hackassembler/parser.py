@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import TextIO, Optional, Type
 
-from src.commands import Dest, Comp, Jump, CCommand, ACommand, Command, LCommand
+from hackassembler.commands import Dest, Comp, Jump, CCommand, ACommand, Command, LCommand
 
 
 class Parser:
@@ -80,8 +80,8 @@ class Parser:
                 raw_address: str = command[1:]
                 return ACommand(raw_address=raw_address)
             else:
-                symblic_address: str = command[1:]
-                return ACommand(symbol_address=symblic_address)
+                symbol_address: str = command[1:]
+                return ACommand(symbol_address=symbol_address)
         else:
             return None
 

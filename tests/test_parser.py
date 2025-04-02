@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from src.commands import Command, ACommand, CCommand, Dest, Comp, Jump
-from src.parser import Parser, NoCommandsFoundError, InvalidSyntaxError
+from hackassembler.commands import Command, ACommand, CCommand, Dest, Comp, Jump
+from hackassembler.parser import Parser, NoCommandsFoundError, InvalidSyntaxError
 
 
 def test_empty_file_raises_no_commands_found_error(

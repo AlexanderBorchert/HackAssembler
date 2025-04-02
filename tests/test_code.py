@@ -4,8 +4,8 @@ import typing
 
 import pytest
 
-from src.code import translate_command_into_binary_code
-from src.commands import Comp, Dest, Jump, CCommand, ACommand, LCommand
+from hackassembler.code import translate_command_into_binary_code
+from hackassembler.commands import Comp, Dest, Jump, CCommand, ACommand, LCommand
 
 
 @typing.no_type_check

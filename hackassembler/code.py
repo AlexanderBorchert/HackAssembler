@@ -1,6 +1,6 @@
 from typing import Optional
 
-from src.commands import Dest, Jump, Comp, Command, ACommand, CCommand, LCommand
+from hackassembler.commands import Dest, Jump, Comp, Command, ACommand, CCommand, LCommand
 
 
 def translate_command_into_binary_code(command: Command, symbol_table: Optional[dict[str, str]] = None) -> str:
